@@ -1,0 +1,380 @@
+[
+  {
+    "eu": {
+      "staff": [
+        {
+          "id": 1,
+          "image": "/items/staff.jpg",
+          "name": "Sagittarius Long Staff",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 2,
+          "image": "/items/staff-2.jpg",
+          "name": "Pices Bronze Staff",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 3,
+          "image": "/items/staff-3.jpg",
+          "name": "Gemini Soul Staff",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 4,
+          "image": "/items/staff-04.jpg",
+          "name": "Aries Wing Staff",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 5,
+          "image": "/items/staff-05.jpg",
+          "name": "Aquarius Mystic Staff",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 6,
+          "image": "/items/staff-06.jpg",
+          "name": "Cancer Blood Flare",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 7,
+          "image": "/items/staff-07.jpg",
+          "name": "Libra Pentacle Ornament",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 8,
+          "image": "/items/staff-08.jpg",
+          "name": "Scorpio Magician Glacier",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 9,
+          "image": "/items/staff-09.jpg",
+          "name": "Taurus Soul Fiend",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 10,
+          "image": "/items/staff-10.jpg",
+          "name": "Capricorn Arcane Hazard",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 11,
+          "image": "/items/staff-11.jpg",
+          "name": "Amooterium",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 12,
+          "image": "/items/staff-12.jpg",
+          "name": "Nephthyras",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 13,
+          "image": "/items/staff-13.jpg",
+          "name": "Evil Soul Rising",
+          "category": "Staff",
+          "race": "European"
+        },
+        {
+          "id": 14,
+          "image": "/items/staff-14.jpg",
+          "name": "Dragonet Soul",
+          "category": "Staff",
+          "race": "European"
+        }
+      ],
+      "1 Handed Sword": [
+        {
+          "id": 15,
+          "image": "/items/1h-1.jpg",
+          "name": "Sagittarius Long Sword",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 16,
+          "image": "/items/1h-2.jpg",
+          "name": "Pisces Gradius",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 17,
+          "image": "/items/1h-3.jpg",
+          "name": "Gemini Broad Sword",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 18,
+          "image": "/items/1h-4.jpg",
+          "name": "Aries Flamberge",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 19,
+          "image": "/items/1h-5.jpg",
+          "name": "Aquarius Misty Blade",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 20,
+          "image": "/items/1h-6.jpg",
+          "name": "Cancer Blaze Sword",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 21,
+          "image": "/items/1h-7.jpg",
+          "name": "Libra Imperial Sword",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 22,
+          "image": "/items/1h-8.jpg",
+          "name": "Virgo Dame Blade",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 23,
+          "image": "/items/1h-9.jpg",
+          "name": "Scorpio Katzbalger",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 24,
+          "image": "/items/1h-10.jpg",
+          "name": "Taurus Dark Monarch",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 25,
+          "image": "/items/1h-11.jpg",
+          "name": "Capricorn Satan Spine",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 26,
+          "image": "/items/1h-12.jpg",
+          "name": "Dark Saber (Martial God)",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 27,
+          "image": "/items/1h-13.jpg",
+          "name": "Kepeshi (God of Battle)",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 28,
+          "image": "/items/1h-14.jpg",
+          "name": "Satan Spirit",
+          "category": "1H Sword",
+          "race": "European"
+        },
+        {
+          "id": 29,
+          "image": "/items/1h-15.jpg",
+          "name": "Dragon Penna",
+          "category": "1H Sword",
+          "race": "European"
+        }
+      ],
+      "2 Handed Sword": [
+        {
+          "id": 30,
+          "level": 1,
+          "psy_attack": "18 ~ 22",
+          "mag_attack": 0,
+          "durability": 39,
+          "image": "/items/2h-1.jpg",
+          "name": "Sagittarius Ward Sword",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 31,
+          "level": 8,
+          "psy_attack": "40 ~ 49",
+          "mag_attack": 0,
+          "durability": 42,
+          "image": "/items/2h-2.jpg",
+          "name": "Pisces Bronze Sword",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 32,
+          "level": 16,
+          "psy_attack": "74 ~ 90",
+          "mag_attack": 0,
+          "durability": 45,
+          "image": "/items/2h-3.jpg",
+          "name": "Gemini Bastard Sword",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 33,
+          "level": 24,
+          "psy_attack": "117 ~ 144",
+          "mag_attack": 0,
+          "durability": 48,
+          "image": "/items/2h-4.jpg",
+          "name": "Aries Giant Sword",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 34,
+          "level": 32,
+          "psy_attack": "174 ~ 213",
+          "mag_attack": 0,
+          "durability": 55,
+          "image": "/items/2h-5.jpg",
+          "name": "Aquarius Great Sword",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 35,
+          "level": 42,
+          "psy_attack": "268 ~ 328",
+          "mag_attack": 0,
+          "durability": 55,
+          "image": "/items/2h-6.jpg",
+          "name": "Cancer Claymore",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 36,
+          "level": 52,
+          "psy_attack": "395 ~ 483",
+          "mag_attack": 0,
+          "durability": 58,
+          "image": "/items/2h-7.jpg",
+          "name": "Libra Radiant Sword",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 37,
+          "level": 64,
+          "psy_attack": "605 ~ 739",
+          "mag_attack": 0,
+          "durability": 63,
+          "image": "/items/2h-8.jpg",
+          "name": "Virgo Knight's Creed",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 38,
+          "level": 76,
+          "psy_attack": "899 ~ 1098",
+          "mag_attack": 0,
+          "durability": 68,
+          "image": "/items/2h-9.jpg",
+          "name": "Scorpius Dark Phantom",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 39,
+          "level": 90,
+          "psy_attack": "1388 ~ 1697",
+          "mag_attack": 0,
+          "durability": 73,
+          "image": "/items/2h-10.jpg",
+          "name": "Taurus Colossus Blade",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 40,
+          "level": 101,
+          "psy_attack": "1924 ~ 2351",
+          "mag_attack": 0,
+          "durability": 77,
+          "image": "/items/2h-11.jpg",
+          "name": "Capricorn Cain Slayer",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 41,
+          "level": 101,
+          "psy_attack": "2354 ~ 2877",
+          "mag_attack": 0,
+          "durability": 80,
+          "image": "/items/2h-12.jpg",
+          "name": "Demolition (Martial God)",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 42,
+          "level": 101,
+          "psy_attack": "2492 ~ 3046",
+          "mag_attack": 0,
+          "durability": 81,
+          "image": "/items/2h-13.jpg",
+          "name": "Kaledvoke (God of Battle)",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 43,
+          "level": 101,
+          "psy_attack": "2564 ~ 3134",
+          "mag_attack": 0,
+          "durability": 81,
+          "image": "/items/2h-14.jpg",
+          "name": "Demogorgon",
+          "category": "2H Sword",
+          "race": "European"
+        },
+        {
+          "id": 44,
+          "level": 101,
+          "psy_attack": "3393 ~ 4147",
+          "mag_attack": 0,
+          "durability": 85,
+          "image": "/items/2h-15.jpg",
+          "name": "Destroyer",
+          "category": "2H Sword",
+          "race": "European"
+        }
+      ]
+    }
+  }
+]
