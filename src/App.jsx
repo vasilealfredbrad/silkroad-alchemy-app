@@ -55,7 +55,7 @@ function App() {
       4: 100,
       5: 100,
     };
-    return rates[level] || 5;
+    return rates[level] || 100;
   };
 
   const handleStrengthen = () => {
