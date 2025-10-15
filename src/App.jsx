@@ -1,6 +1,7 @@
 import { Diamond, Sparkles, Zap, Flame, Star } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
+import ParticleSystem from "./components/ParticleSystem";
 
 import items from "./lib/items.json";
 
@@ -44,40 +45,39 @@ function App() {
   const [lastResult, setLastResult] = useState(null);
   const [gold, setGold] = useState(1000000000000);
   const [autoStart, setAutoStart] = useState(false);
-  const [showParticles, setShowParticles] = useState(false);
   const [particleType, setParticleType] = useState('success');
   const [screenShake, setScreenShake] = useState(false);
   const [goldChange, setGoldChange] = useState(0);
   const [floatingParticles, setFloatingParticles] = useState([]);
   const [magicCircle, setMagicCircle] = useState(false);
   const [energyFlow, setEnergyFlow] = useState(false);
+  const [particleTrigger, setParticleTrigger] = useState(0);
   const itemRef = useRef(null);
   const smokeRef = useRef(null);
-  const particleRef = useRef(null);
   const progressRef = useRef(null);
   const goldRef = useRef(null);
   const screenRef = useRef(null);
   const centerAreaRef = useRef(null);
   const energyFlowRef = useRef(null);
+  const circularProgressRef = useRef(null);
 
   const getSuccessRate = (level) => {
     const rates = {
       0: 100,
-      1: 95,
-      2: 90,
-      3: 85,
-      4: 80,
-      5: 75,
-      6: 70,
-      7: 65,
-      8: 60,
-      9: 55,
-      10: 50,
-      11: 45,
-      12: 40,
-      13: 35,
-      14: 30,
-      15: 25,
+      1: 100,
+      2: 100,
+      3: 100,
+      4: 100,
+      5: 100,
+      6: 30,
+      7: 20,
+      8: 100,
+      9: 85,
+      10: 100,
+      12: 88,
+      13: 100,
+      14: 70,
+      15: 100,
     };
     return rates[level] || 20;
   };
@@ -107,21 +107,7 @@ function App() {
     setWeaponLevel(0);
   };
 
-  const createParticles = (type) => {
-    setParticleType(type);
-    setShowParticles(true);
-    
-    if (particleRef.current) {
-      gsap.set(particleRef.current, { opacity: 1, scale: 0 });
-      gsap.to(particleRef.current, {
-        scale: 3,
-        opacity: 0,
-        duration: 2,
-        ease: "power2.out",
-        onComplete: () => setShowParticles(false)
-      });
-    }
-  };
+  // Removed old createParticles function - using Three.js ParticleSystem instead
 
   const screenShakeEffect = () => {
     setScreenShake(true);
@@ -133,7 +119,9 @@ function App() {
         repeat: 5,
         ease: "power2.inOut",
         onComplete: () => {
-          gsap.set(screenRef.current, { x: 0 });
+          if (screenRef.current) {
+            gsap.set(screenRef.current, { x: 0 });
+          }
           setScreenShake(false);
         }
       });
@@ -152,31 +140,25 @@ function App() {
   };
 
   const animateProgressBar = () => {
-    if (progressRef.current) {
-      gsap.fromTo(progressRef.current,
-        { scaleX: 0, backgroundColor: "#4a5568" },
-        { scaleX: 1, duration: 0.1, ease: "none" }
+    if (circularProgressRef.current) {
+      gsap.fromTo(circularProgressRef.current,
+        { strokeDashoffset: 175.9 },
+        { strokeDashoffset: 0, duration: 2, ease: "power2.out" }
       );
-      
-      gsap.to(progressRef.current, {
-        backgroundColor: "#eab308",
-        duration: 0.5,
-        ease: "power2.out"
-      });
     }
   };
 
   const createFloatingParticles = () => {
     const particles = [];
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 12; i++) {
       particles.push({
         id: i,
-        x: Math.random() * 200 - 100,
-        y: Math.random() * 200 - 100,
-        size: Math.random() * 4 + 2,
+        x: Math.random() * 120 - 60, // Smaller area around item
+        y: Math.random() * 120 - 60,
+        size: Math.random() * 3 + 2,
         color: Math.random() > 0.5 ? '#FFD700' : '#FFA500',
-        delay: Math.random() * 2,
-        duration: Math.random() * 3 + 2
+        delay: Math.random() * 0.5, // Faster start
+        duration: Math.random() * 1.5 + 1.5 // Shorter duration
       });
     }
     setFloatingParticles(particles);
@@ -186,13 +168,13 @@ function App() {
     setMagicCircle(true);
     if (centerAreaRef.current) {
       gsap.fromTo(centerAreaRef.current, 
-        { scale: 0.8, opacity: 0 },
-        { scale: 1.1, opacity: 0.8, duration: 0.5, ease: "power2.out" }
+        { scale: 0.5, opacity: 0 },
+        { scale: 1.2, opacity: 0.6, duration: 0.3, ease: "power2.out" }
       );
       gsap.to(centerAreaRef.current, {
         scale: 1,
         opacity: 0,
-        duration: 1.5,
+        duration: 0.8, // Much shorter
         ease: "power2.out",
         onComplete: () => setMagicCircle(false)
       });
@@ -204,14 +186,14 @@ function App() {
     if (energyFlowRef.current) {
       gsap.fromTo(energyFlowRef.current,
         { scaleX: 0, opacity: 0 },
-        { scaleX: 1, opacity: 1, duration: 0.8, ease: "power2.out" }
+        { scaleX: 1, opacity: 1, duration: 0.4, ease: "power2.out" }
       );
       gsap.to(energyFlowRef.current, {
         scaleX: 0,
         opacity: 0,
-        duration: 0.5,
+        duration: 0.3,
         ease: "power2.in",
-        delay: 0.3,
+        delay: 0.2, // Shorter delay
         onComplete: () => setEnergyFlow(false)
       });
     }
@@ -221,19 +203,42 @@ function App() {
     createFloatingParticles();
     animateMagicCircle();
     animateEnergyFlow();
+    animateCircularProgress();
+  };
+
+  const animateCircularProgress = () => {
+    if (circularProgressRef.current) {
+      gsap.fromTo(circularProgressRef.current, 
+        { strokeDashoffset: 175.9 },
+        { strokeDashoffset: 0, duration: 2, ease: "power2.out" }
+      );
+    }
+  };
+
+  const triggerParticleBurst = (type) => {
+    setParticleType(type);
+    setParticleTrigger(prev => prev + 1);
+  };
+
+  const handleParticleComplete = () => {
+    // Reset particle trigger after animation completes (longer delay for smooth particles)
+    setTimeout(() => {
+      setParticleTrigger(0);
+    }, 500);
   };
 
   // Auto-start effect
   React.useEffect(() => {
     if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
       const timer = setTimeout(() => {
+        // Double-check conditions before proceeding
         if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
           handleStrengthen();
         }
-      }, 1000); // 1 second delay to prevent rapid clicking
+      }, 5000); // Much longer delay to enjoy the beautiful particle animations
       return () => clearTimeout(timer);
     }
-  }, [autoStart, selectedItem, selectedElixir, isStrengthening, gold, lastResult]);
+  }, [autoStart, selectedItem, selectedElixir, isStrengthening, gold]);
 
   const handleStrengthen = () => {
     if (!selectedItem || !selectedElixir || isStrengthening || gold < 10)
@@ -265,91 +270,121 @@ function App() {
 
         if (isSuccess) {
           // Success animations
-          gsap.to(itemRef.current, {
-            scale: 1.3,
-            duration: 0.2,
-            yoyo: true,
-            repeat: 2,
-            ease: "power2.inOut",
-          });
+          if (itemRef.current) {
+            gsap.to(itemRef.current, {
+              scale: 1.3,
+              duration: 0.2,
+              yoyo: true,
+              repeat: 2,
+              ease: "power2.inOut",
+            });
+          }
           
           // Level up glow effect
-          gsap.fromTo(itemRef.current, {
-            boxShadow: "0 0 0px #00ff00"
-          }, {
-            boxShadow: "0 0 20px #00ff00, 0 0 40px #00ff00",
-            duration: 0.5,
-            ease: "power2.out"
-          });
+          if (itemRef.current) {
+            gsap.fromTo(itemRef.current, {
+              boxShadow: "0 0 0px #00ff00"
+            }, {
+              boxShadow: "0 0 20px #00ff00, 0 0 40px #00ff00",
+              duration: 0.5,
+              ease: "power2.out"
+            });
+          }
           
           setWeaponLevel((prev) => prev + 1);
           setLastResult("success");
-          createParticles("success");
+          triggerParticleBurst("success");
           
-          // Success sound effect (visual feedback)
-          gsap.to(progressRef.current, {
-            backgroundColor: "#00ff00",
-            duration: 0.3,
-            ease: "power2.out"
-          });
+          // Success visual feedback
+          if (circularProgressRef.current) {
+            gsap.to(circularProgressRef.current, {
+              stroke: "#00ff00",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
           
         } else {
           // Failure animations
           screenShakeEffect();
           
-          gsap.set(smokeRef.current, { opacity: 1, scale: 0.5 });
-          gsap.to(smokeRef.current, {
-            scale: 2.5,
-            opacity: 0,
-            duration: 1.5,
-            ease: "power2.out",
-          });
+          if (smokeRef.current) {
+            gsap.set(smokeRef.current, { opacity: 1, scale: 0.5 });
+            gsap.to(smokeRef.current, {
+              scale: 2.5,
+              opacity: 0,
+              duration: 1.5,
+              ease: "power2.out",
+            });
+          }
 
-          gsap.to(itemRef.current, {
-            x: -10,
-            duration: 0.1,
-            yoyo: true,
-            repeat: 8,
-            ease: "power2.inOut",
-            onComplete: () => gsap.set(itemRef.current, { x: 0 }),
-          });
+          if (itemRef.current) {
+            gsap.to(itemRef.current, {
+              x: -10,
+              duration: 0.1,
+              yoyo: true,
+              repeat: 8,
+              ease: "power2.inOut",
+              onComplete: () => {
+                if (itemRef.current) {
+                  gsap.set(itemRef.current, { x: 0 });
+                }
+              },
+            });
+          }
           
           // Failure glow effect
-          gsap.fromTo(itemRef.current, {
-            boxShadow: "0 0 0px #ff0000"
-          }, {
-            boxShadow: "0 0 20px #ff0000, 0 0 40px #ff0000",
-            duration: 0.5,
-            ease: "power2.out"
-          });
+          if (itemRef.current) {
+            gsap.fromTo(itemRef.current, {
+              boxShadow: "0 0 0px #ff0000"
+            }, {
+              boxShadow: "0 0 20px #ff0000, 0 0 40px #ff0000",
+              duration: 0.5,
+              ease: "power2.out"
+            });
+          }
           
           setLastResult("fail");
           setWeaponLevel(0);
-          createParticles("fail");
+          triggerParticleBurst("fail");
           
           // Failure visual feedback
-          gsap.to(progressRef.current, {
-            backgroundColor: "#ff0000",
-            duration: 0.3,
-            ease: "power2.out"
-          });
+          if (circularProgressRef.current) {
+            gsap.to(circularProgressRef.current, {
+              stroke: "#ff0000",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
         }
 
         setIsStrengthening(false);
         setProgress(0);
         
-        // Clear particles after a delay
+        // Clear particles after a shorter delay
         setTimeout(() => {
           setFloatingParticles([]);
-        }, 3000);
+        }, 2000); // Reduced from 3000ms to 2000ms
         
-        // Reset glow after animation
+        // Reset glow and progress after animation
         setTimeout(() => {
-          gsap.to(itemRef.current, {
-            boxShadow: "0 0 0px transparent",
-            duration: 0.5,
-            ease: "power2.out"
-          });
+          if (itemRef.current) {
+            gsap.to(itemRef.current, {
+              boxShadow: "0 0 0px transparent",
+              duration: 0.5,
+              ease: "power2.out"
+            });
+          }
+          
+          // Reset circular progress
+          if (circularProgressRef.current) {
+            gsap.to(circularProgressRef.current, {
+              strokeDashoffset: 175.9,
+              stroke: "url(#progressGradient)",
+              duration: 0.3,
+              ease: "power2.out"
+            });
+          }
         }, 1000);
       }
     }, interval);
@@ -368,21 +403,23 @@ function App() {
         </div>
 
         <div className="p-4 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#2b292a]">
-          <div className="border-4 border-[#6c6554] mb-8 relative overflow-hidden">
+          <div className={`border-4 border-[#6c6554] mb-8 relative overflow-hidden bg-gradient-to-br from-[#1a1a0a] to-[#0f0f0a] transition-all duration-300 ${
+            isStrengthening ? 'border-yellow-500 shadow-lg shadow-yellow-500/20' : ''
+          }`}>
             {/* Magic Circle Effect */}
             {magicCircle && (
               <div
                 ref={centerAreaRef}
-                className="absolute inset-0 pointer-events-none z-10 animate-magic-pulse"
+                className="absolute inset-0 pointer-events-none z-10"
                 style={{
-                  background: 'radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,165,0,0.3) 20%, rgba(255,69,0,0.2) 40%, transparent 70%)',
+                  background: 'radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,165,0,0.2) 30%, transparent 60%)',
                   borderRadius: '50%',
                   transform: 'translate(-50%, -50%)',
                   left: '50%',
                   top: '50%',
-                  width: '250px',
-                  height: '250px',
-                  boxShadow: '0 0 50px rgba(255,215,0,0.5), inset 0 0 30px rgba(255,165,0,0.3)'
+                  width: '180px',
+                  height: '180px',
+                  boxShadow: '0 0 30px rgba(255,215,0,0.4)'
                 }}
               />
             )}
@@ -399,9 +436,10 @@ function App() {
                   height: `${particle.size}px`,
                   backgroundColor: particle.color,
                   borderRadius: '50%',
-                  boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
+                  boxShadow: `0 0 ${particle.size * 3}px ${particle.color}, 0 0 ${particle.size * 6}px ${particle.color}40`,
                   animationDelay: `${particle.delay}s`,
-                  animationDuration: `${particle.duration}s`
+                  animationDuration: `${particle.duration}s`,
+                  filter: 'brightness(1.2)'
                 }}
               />
             ))}
@@ -419,26 +457,62 @@ function App() {
               />
             )}
             
-            <div className="grid grid-cols-[42px_1fr] gap-3 p-3 relative z-10">
-              <div className="relative">
-                <div
-                  ref={itemRef}
-                  className={`w-10 h-10 bg-[#0a0a07] border-2 border-[#403e3e] flex items-center justify-center relative ${
-                    isStrengthening ? "animate-glow" : ""
-                  }`}
-                  onMouseEnter={() => setItemHover(true)}
-                  onMouseLeave={() => setItemHover(false)}
-                >
-                  {/* Sparkle Effects During Strengthening */}
-                  {isStrengthening && (
-                    <>
-                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '0s' }}></div>
-                      <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-orange-400 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '0.5s' }}></div>
-                      <div className="absolute top-1/2 -left-2 w-1 h-1 bg-yellow-300 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '1s' }}></div>
-                      <div className="absolute top-1/2 -right-2 w-1 h-1 bg-orange-300 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '1.5s' }}></div>
-                    </>
-                  )}
-                  {selectedItem && (
+            <div className="grid grid-cols-[64px_1fr] gap-3 p-3 relative z-10">
+              <div className="relative flex items-center justify-center">
+                {/* Circular Progress Bar */}
+                <div className="relative w-16 h-16">
+                  <svg className="absolute inset-0 -rotate-90 w-16 h-16">
+                    <defs>
+                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#eab308" />
+                        <stop offset="50%" stopColor="#f59e0b" />
+                        <stop offset="100%" stopColor="#eab308" />
+                      </linearGradient>
+                    </defs>
+                    <circle
+                      cx="32"
+                      cy="32"
+                      r="28"
+                      stroke="#403e3e"
+                      strokeWidth="3"
+                      fill="none"
+                    />
+                    <circle
+                      ref={circularProgressRef}
+                      cx="32"
+                      cy="32"
+                      r="28"
+                      stroke="url(#progressGradient)"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeDasharray="175.9"
+                      strokeDashoffset="175.9"
+                      className={`${isStrengthening ? 'animate-circular-glow' : ''}`}
+                      style={{
+                        filter: isStrengthening ? 'drop-shadow(0 0 10px #eab308)' : 'none'
+                      }}
+                    />
+                  </svg>
+                  
+                  {/* Item Slot */}
+                  <div
+                    ref={itemRef}
+                    className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-[#0a0a07] border-2 border-[#403e3e] flex items-center justify-center relative ${
+                      isStrengthening ? "animate-glow" : ""
+                    }`}
+                    onMouseEnter={() => setItemHover(true)}
+                    onMouseLeave={() => setItemHover(false)}
+                  >
+                    {/* Sparkle Effects During Strengthening */}
+                    {isStrengthening && (
+                      <>
+                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '0s' }}></div>
+                        <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-orange-400 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '0.5s' }}></div>
+                        <div className="absolute top-1/2 -left-2 w-1 h-1 bg-yellow-300 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '1s' }}></div>
+                        <div className="absolute top-1/2 -right-2 w-1 h-1 bg-orange-300 rounded-full animate-sparkle-twinkle" style={{ animationDelay: '1.5s' }}></div>
+                      </>
+                    )}
+                    {selectedItem && (
                     <>
                       <img
                         src={selectedItem.image}
@@ -491,7 +565,8 @@ function App() {
                         </div>
                       )}
                     </>
-                  )}
+                    )}
+                  </div>
                 </div>
 
                 <div
@@ -539,27 +614,13 @@ function App() {
             </div>
           </div>
 
-          <div className="progress overflow-hidden">
-            <div className="bg-black py-1 border-2 border-[#403e3e] rounded-md overflow-hidden relative">
-              <div
-                ref={progressRef}
-                className={`h-4 transition-all duration-200 ${
-                  isStrengthening ? 'animate-pulse' : ''
-                }`}
-                style={{
-                  width: `${progress}%`,
-                  background: isStrengthening 
-                    ? 'linear-gradient(90deg, #eab308, #f59e0b, #eab308)'
-                    : '#eab308',
-                  backgroundSize: isStrengthening ? '200% 100%' : '100% 100%',
-                  animation: isStrengthening ? 'shimmer 1s infinite' : 'none',
-                  boxShadow: isStrengthening ? '0 0 10px #eab308' : 'none'
-                }}
-              ></div>
-              {isStrengthening && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
-              )}
-            </div>
+          {/* Particle System Overlay - Only in center area */}
+          <div className="absolute inset-0 pointer-events-none z-20">
+            <ParticleSystem 
+              type={particleType}
+              trigger={particleTrigger}
+              onComplete={handleParticleComplete}
+            />
           </div>
 
           <div className="flex flex-col items-center justify-center mt-4 gap-2">
@@ -625,21 +686,23 @@ function App() {
             </button>
             {lastResult && (
               <div
-                className={`text-xs font-bold mt-1 animate-bounce ${
-                  lastResult === "success" ? "text-green-400" : "text-red-400"
+                className={`text-sm font-bold mt-2 px-3 py-1 rounded-full transition-all duration-500 ${
+                  lastResult === "success" 
+                    ? "text-green-400 bg-green-400/10 border border-green-400/30 animate-bounce" 
+                    : "text-red-400 bg-red-400/10 border border-red-400/30 animate-bounce"
                 }`}
               >
                 {lastResult === "success" ? (
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 animate-spin" />
                     SUCCESS!
-                    <Star className="w-4 h-4" />
+                    <Star className="w-4 h-4 animate-spin" />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1">
-                    <Flame className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 animate-pulse" />
                     FAILED!
-                    <Flame className="w-4 h-4" />
+                    <Flame className="w-4 h-4 animate-pulse" />
                   </div>
                 )}
               </div>
@@ -755,35 +818,6 @@ function App() {
           </div>
         </div>
       </div>
-      
-      {/* Particle System */}
-      {showParticles && (
-        <div
-          ref={particleRef}
-          className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center"
-        >
-          <div className="relative">
-            {particleType === 'success' ? (
-              <div className="flex flex-col items-center">
-                <Sparkles className="w-16 h-16 text-yellow-400 animate-spin" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Star className="w-8 h-8 text-yellow-300 animate-ping" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Star className="w-4 h-4 text-yellow-200 animate-pulse" />
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <Flame className="w-16 h-16 text-red-500 animate-bounce" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 border-2 border-red-400 rounded-full animate-ping opacity-75"></div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
