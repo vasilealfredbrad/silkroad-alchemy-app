@@ -2,7 +2,34 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const ParticleBurst = ({ type, trigger, onComplete }) => {
+// Color mapping function for different weapon levels
+const getLevelColor = (level) => {
+  const colors = {
+    3: { r: 1, g: 0.84, b: 0 },      // Yellow
+    5: { r: 0.58, g: 0, b: 0.83 },   // Purple
+    6: { r: 1, g: 0.55, b: 0 },      // Orange
+    7: { r: 0, g: 1, b: 1 },         // Cyan
+    8: { r: 1, g: 0.08, b: 0.58 },   // Hot Pink
+    9: { r: 0.42, g: 0.35, b: 0.8 }, // Blue-Purple
+    10: { r: 0.25, g: 0.88, b: 0.82 } // Turquoise
+  };
+  
+  if (level >= 11) {
+    // Random vibrant colors for +11+
+    const palette = [
+      { r: 1, g: 0, b: 1 },     // Magenta
+      { r: 0, g: 1, b: 0.5 },   // Spring Green
+      { r: 1, g: 0.27, b: 0 },  // Orange Red
+      { r: 0.5, g: 0, b: 1 },   // Electric Purple
+      { r: 1, g: 0.84, b: 0 }   // Gold
+    ];
+    return palette[Math.floor(Math.random() * palette.length)];
+  }
+  
+  return colors[level] || { r: 1, g: 0.84, b: 0 }; // Default yellow
+};
+
+const ParticleBurst = ({ type, trigger, onComplete, weaponLevel }) => {
   const meshRef = useRef();
   const particlesRef = useRef();
   const materialRef = useRef();
@@ -11,7 +38,7 @@ const ParticleBurst = ({ type, trigger, onComplete }) => {
   const radius = 0.1;
   
   // Create high-quality particle textures
-  const createParticleTexture = (type) => {
+  const createParticleTexture = (type, level) => {
     const canvas = document.createElement('canvas');
     const size = 64; // High resolution
     canvas.width = size;
@@ -22,13 +49,18 @@ const ParticleBurst = ({ type, trigger, onComplete }) => {
     const gradient = context.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
     
     if (type === 'success') {
-      // Golden sparkle texture
+      // Level-based color texture
+      const levelColor = getLevelColor(level);
+      const r = Math.floor(levelColor.r * 255);
+      const g = Math.floor(levelColor.g * 255);
+      const b = Math.floor(levelColor.b * 255);
+      
       gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-      gradient.addColorStop(0.3, 'rgba(255, 215, 0, 0.8)');
-      gradient.addColorStop(0.7, 'rgba(255, 165, 0, 0.6)');
-      gradient.addColorStop(1, 'rgba(255, 140, 0, 0)');
+      gradient.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, 0.8)`);
+      gradient.addColorStop(0.7, `rgba(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)}, 0.6)`);
+      gradient.addColorStop(1, `rgba(${Math.floor(r * 0.6)}, ${Math.floor(g * 0.6)}, ${Math.floor(b * 0.6)}, 0)`);
     } else {
-      // Red ember texture
+      // Red ember texture (unchanged for failures)
       gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
       gradient.addColorStop(0.3, 'rgba(255, 100, 100, 0.8)');
       gradient.addColorStop(0.7, 'rgba(200, 50, 50, 0.6)');
@@ -67,15 +99,22 @@ const ParticleBurst = ({ type, trigger, onComplete }) => {
       positions[i3 + 1] = 0;
       positions[i3 + 2] = 0;
       
-      // Beautiful colors with variations based on type
+      // Beautiful colors with variations based on type and level
       if (type === 'success') {
-        // Golden success particles with variations
-        const goldVariation = 0.1 + Math.random() * 0.2;
-        colors[i3] = 1; // R - Full red for gold
-        colors[i3 + 1] = 0.7 + goldVariation; // G - Golden yellow
-        colors[i3 + 2] = 0.1 + Math.random() * 0.1; // B - Slight blue for warmth
+        // Level-based success particles with variations
+        const levelColor = getLevelColor(weaponLevel);
+        const colorVariation = 0.1 + Math.random() * 0.2;
+        
+        colors[i3] = levelColor.r + (Math.random() - 0.5) * colorVariation; // R
+        colors[i3 + 1] = levelColor.g + (Math.random() - 0.5) * colorVariation; // G
+        colors[i3 + 2] = levelColor.b + (Math.random() - 0.5) * colorVariation; // B
+        
+        // Ensure colors stay within valid range
+        colors[i3] = Math.max(0, Math.min(1, colors[i3]));
+        colors[i3 + 1] = Math.max(0, Math.min(1, colors[i3 + 1]));
+        colors[i3 + 2] = Math.max(0, Math.min(1, colors[i3 + 2]));
       } else {
-        // Dark red failure particles with variations
+        // Dark red failure particles with variations (unchanged)
         const redVariation = 0.1 + Math.random() * 0.2;
         colors[i3] = 0.8 + redVariation; // R - Deep red
         colors[i3 + 1] = 0.1 + Math.random() * 0.1; // G - Very little green
@@ -116,7 +155,7 @@ const ParticleBurst = ({ type, trigger, onComplete }) => {
     geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
     
     // Create high-quality material with custom texture
-    const particleTexture = createParticleTexture(type);
+    const particleTexture = createParticleTexture(type, weaponLevel);
     const material = new THREE.PointsMaterial({
       size: 0.15, // Larger particles for better visibility
       vertexColors: true,
@@ -269,8 +308,13 @@ const ParticleBurst = ({ type, trigger, onComplete }) => {
       
       // Add color intensity variation for more magic
       if (type === 'success') {
+        const levelColor = getLevelColor(weaponLevel);
         const colorIntensity = Math.sin(time * 6) * 0.2 + 0.8;
-        material.color.setRGB(1, 0.8 * colorIntensity, 0.2 * colorIntensity);
+        material.color.setRGB(
+          levelColor.r * colorIntensity,
+          levelColor.g * colorIntensity,
+          levelColor.b * colorIntensity
+        );
       } else {
         const colorIntensity = Math.sin(time * 4) * 0.15 + 0.85;
         material.color.setRGB(0.9 * colorIntensity, 0.1 * colorIntensity, 0.1 * colorIntensity);
@@ -292,7 +336,7 @@ const ParticleBurst = ({ type, trigger, onComplete }) => {
   );
 };
 
-const ParticleSystem = ({ type, trigger, onComplete }) => {
+const ParticleSystem = ({ type, trigger, onComplete, weaponLevel }) => {
   if (!trigger) return null;
   
   return (
@@ -309,7 +353,7 @@ const ParticleSystem = ({ type, trigger, onComplete }) => {
         }}
       >
         <ambientLight intensity={0.5} />
-        <ParticleBurst type={type} trigger={trigger} onComplete={onComplete} />
+        <ParticleBurst type={type} trigger={trigger} onComplete={onComplete} weaponLevel={weaponLevel} />
       </Canvas>
     </div>
   );

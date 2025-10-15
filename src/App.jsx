@@ -620,6 +620,7 @@ function App() {
               type={particleType}
               trigger={particleTrigger}
               onComplete={handleParticleComplete}
+              weaponLevel={weaponLevel}
             />
           </div>
 
