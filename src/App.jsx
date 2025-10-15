@@ -48,11 +48,11 @@ function App() {
 
   const getSuccessRate = (level) => {
     const rates = {
-      0: 90,
-      1: 80,
-      2: 70,
-      3: 70,
-      4: 70,
+      0: 100,
+      1: 100,
+      2: 100,
+      3: 100,
+      4: 99,
       5: 70,
     };
     return rates[level] || 5;
