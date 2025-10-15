@@ -42,7 +42,7 @@ function App() {
   const [isStrengthening, setIsStrengthening] = useState(false);
   const [progress, setProgress] = useState(0);
   const [lastResult, setLastResult] = useState(null);
-  const [gold, setGold] = useState(100);
+  const [gold, setGold] = useState(1000000000000);
   const itemRef = useRef(null);
   const smokeRef = useRef(null);
 
