@@ -99,6 +99,13 @@
           "name": "Dragonet Soul",
           "category": "Staff",
           "race": "European"
+        },
+        {
+          "id": 15,
+          "image": "/items/staff-14.jpg",
+          "name": "Dragonet Soul",
+          "category": "Staff",
+          "race": "European"
         }
       ],
       "1 Handed Sword": [
