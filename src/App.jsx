@@ -235,7 +235,7 @@ function App() {
         if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
           handleStrengthen();
         }
-      }, 5000); // Much longer delay to enjoy the beautiful particle animations
+      }, 7000); // Even longer delay to enjoy the beautiful high-quality particle animations
       return () => clearTimeout(timer);
     }
   }, [autoStart, selectedItem, selectedElixir, isStrengthening, gold]);
