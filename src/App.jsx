@@ -52,6 +52,11 @@ function App() {
   const [magicCircle, setMagicCircle] = useState(false);
   const [energyFlow, setEnergyFlow] = useState(false);
   const [particleTrigger, setParticleTrigger] = useState(0);
+  const [autoStartCountdown, setAutoStartCountdown] = useState(0);
+  const [enhancementLog, setEnhancementLog] = useState([]);
+  const [maxLevelReached, setMaxLevelReached] = useState(0);
+  const [showLog, setShowLog] = useState(false);
+  const [itemCounts, setItemCounts] = useState({}); // Track items by enhancement level
   const itemRef = useRef(null);
   const smokeRef = useRef(null);
   const progressRef = useRef(null);
@@ -227,18 +232,99 @@ function App() {
     }, 500);
   };
 
-  // Auto-start effect
+  // Log enhancement progress
+  const logEnhancement = (level, success, itemName) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = {
+      id: Date.now(),
+      timestamp,
+      level,
+      success,
+      itemName,
+      goldSpent: 10
+    };
+    
+    setEnhancementLog(prev => [logEntry, ...prev.slice(0, 49)]); // Keep last 50 entries
+    
+    if (success && level > maxLevelReached) {
+      setMaxLevelReached(level);
+    }
+  };
+
+  const updateItemCount = (level, increment = 1) => {
+    setItemCounts(prev => ({
+      ...prev,
+      [level]: (prev[level] || 0) + increment
+    }));
+  };
+
+  // Save progress to localStorage
+  const saveProgress = () => {
+    const progress = {
+      weaponLevel,
+      maxLevelReached,
+      enhancementLog: enhancementLog.slice(0, 20), // Save last 20 entries
+      gold,
+      selectedItem: selectedItem?.name,
+      itemCounts,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('alchemyProgress', JSON.stringify(progress));
+  };
+
+  // Load progress from localStorage
+  const loadProgress = () => {
+    const saved = localStorage.getItem('alchemyProgress');
+    if (saved) {
+      try {
+        const progress = JSON.parse(saved);
+        setMaxLevelReached(progress.maxLevelReached || 0);
+        setEnhancementLog(progress.enhancementLog || []);
+        setItemCounts(progress.itemCounts || {});
+        if (progress.gold) setGold(progress.gold);
+      } catch (e) {
+        console.log('Could not load saved progress');
+      }
+    }
+  };
+
+  // Auto-start effect with countdown
   React.useEffect(() => {
     if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
-      const timer = setTimeout(() => {
-        // Double-check conditions before proceeding
-        if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
-          handleStrengthen();
-        }
-      }, 7000); // Even longer delay to enjoy the beautiful high-quality particle animations
-      return () => clearTimeout(timer);
+      setAutoStartCountdown(4);
+      
+      const countdownInterval = setInterval(() => {
+        setAutoStartCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(countdownInterval);
+            // Double-check conditions before proceeding
+            if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
+              handleStrengthen();
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      return () => {
+        clearInterval(countdownInterval);
+        setAutoStartCountdown(0);
+      };
+    } else {
+      setAutoStartCountdown(0);
     }
   }, [autoStart, selectedItem, selectedElixir, isStrengthening, gold]);
+
+  // Load progress on component mount
+  React.useEffect(() => {
+    loadProgress();
+  }, []);
+
+  // Auto-save progress
+  React.useEffect(() => {
+    saveProgress();
+  }, [weaponLevel, maxLevelReached, enhancementLog, gold, itemCounts]);
 
   const handleStrengthen = () => {
     if (!selectedItem || !selectedElixir || isStrengthening || gold < 10)
@@ -291,9 +377,16 @@ function App() {
             });
           }
           
-          setWeaponLevel((prev) => prev + 1);
+          const newLevel = weaponLevel + 1;
+          setWeaponLevel(newLevel);
           setLastResult("success");
           triggerParticleBurst("success");
+          
+          // Add item to inventory at the new level
+          updateItemCount(newLevel, 1);
+          
+          // Log successful enhancement
+          logEnhancement(newLevel, true, selectedItem.name);
           
           // Success visual feedback
           if (circularProgressRef.current) {
@@ -345,8 +438,11 @@ function App() {
           }
           
           setLastResult("fail");
-          setWeaponLevel(0);
+          // Keep current level on failure - no reset to 0
           triggerParticleBurst("fail");
+          
+          // Log failed enhancement
+          logEnhancement(weaponLevel, false, selectedItem.name);
           
           // Failure visual feedback
           if (circularProgressRef.current) {
@@ -624,7 +720,58 @@ function App() {
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center mt-4 gap-2">
+          {/* Level Progression List */}
+          <div className="mt-4 mb-2">
+            <div className="text-xs text-gray-300 text-center mb-2">
+              Weapon Enhancement Levels
+              {maxLevelReached > 0 && (
+                <span className="text-yellow-400 ml-2">
+                  (Max: +{maxLevelReached})
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap justify-center gap-1 text-xs">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
+                <div
+                  key={level}
+                  className={`px-2 py-1 rounded border transition-all duration-300 ${
+                    weaponLevel >= level
+                      ? 'bg-yellow-400 text-black border-yellow-500 font-bold scale-105'
+                      : maxLevelReached >= level
+                      ? 'bg-green-600 text-white border-green-500'
+                      : 'bg-gray-700 text-gray-400 border-gray-600'
+                  }`}
+                >
+                  +{level}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Item Counts Display */}
+          <div className="mt-4 mb-2">
+            <div className="text-xs text-gray-300 text-center mb-2">
+              Item Inventory
+            </div>
+            <div className="flex flex-wrap justify-center gap-1 text-xs max-h-20 overflow-y-auto">
+              {Object.entries(itemCounts)
+                .filter(([level, count]) => count > 0)
+                .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                .map(([level, count]) => (
+                  <div
+                    key={level}
+                    className="px-2 py-1 rounded border bg-blue-600 text-white border-blue-500 font-bold"
+                  >
+                    +{level} ×{count}
+                  </div>
+                ))}
+              {Object.keys(itemCounts).length === 0 && (
+                <div className="text-gray-500 text-xs">No items yet</div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center mt-2 gap-2">
             <div className="flex items-center gap-1 text-xs text-yellow-400 font-bold mb-1">
               <GoldIcon />
               <span 
@@ -657,10 +804,34 @@ function App() {
                   </span>
                   <span>| Cost: 10 Gold</span>
                 </div>
-                {autoStart && (
-                  <div className="text-green-400 font-bold mt-1 animate-pulse">
+                {isStrengthening && (
+                  <div className="mt-2 text-center">
+                    <div className="text-yellow-400 font-bold animate-pulse">
+                      ⚡ Strengthening in progress... ⚡
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1 mb-2">
+                      Process takes ~3 seconds
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all duration-100 ease-out"
+                        style={{ width: `${(progress / 100) * 100}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {Math.round(progress)}% Complete
+                    </div>
+                  </div>
+                )}
+                {autoStart && !isStrengthening && (
+                  <div className="text-green-400 font-bold mt-1">
                     <Sparkles className="inline w-4 h-4 mr-1" />
                     AUTO-STRENGTHENING ACTIVE
+                    {autoStartCountdown > 0 && (
+                      <div className="text-yellow-400 text-sm mt-1">
+                        Next attempt in: {autoStartCountdown}s
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -745,6 +916,13 @@ function App() {
                 </>
               )}
             </button>
+            <button
+              onClick={() => setShowLog(!showLog)}
+              className="text-xs py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 flex items-center gap-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-800 shadow-lg"
+            >
+              <Star className="w-3 h-3" />
+              {showLog ? "Hide Log" : "Show Log"}
+            </button>
           </div>
           <div className="border-4 border-[#6c6554] mb-8 py-2 px-4 max-h-64 overflow-y-scroll">
             <h4 className="text-sm text-[#efffc5] font-bold mb-4">Weapons</h4>
@@ -819,6 +997,68 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Enhancement Log Modal */}
+      {showLog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#0d0d0d] rounded-lg shadow-2xl w-96 max-h-96 border-2 border-[#969383]">
+            <div className="bg-[#0d0d0d] px-4 py-2 rounded-t-md flex justify-between items-center border-b-2 border-[#969383]">
+              <h2 className="text-white font-bold text-sm">Enhancement Log</h2>
+              <button
+                onClick={() => setShowLog(false)}
+                className="text-gray-400 hover:text-white text-xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#2b292a] max-h-80 overflow-y-auto">
+              {enhancementLog.length === 0 ? (
+                <div className="text-gray-400 text-center py-4">
+                  No enhancements yet
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {enhancementLog.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className={`p-2 rounded border-l-4 ${
+                        entry.success
+                          ? 'bg-green-900/20 border-green-500 text-green-300'
+                          : 'bg-red-900/20 border-red-500 text-red-300'
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="font-bold">
+                            {entry.success ? '✓' : '✗'} +{entry.level} {entry.itemName}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {entry.timestamp} • {entry.goldSpent} gold
+                          </div>
+                        </div>
+                        <div className="text-xs">
+                          {entry.success ? 'SUCCESS' : 'FAILED'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="mt-4 pt-4 border-t border-gray-600">
+                <div className="text-sm text-gray-300">
+                  <div>Max Level Reached: <span className="text-yellow-400 font-bold">+{maxLevelReached}</span></div>
+                  <div>Total Attempts: <span className="text-blue-400 font-bold">{enhancementLog.length}</span></div>
+                  <div>Success Rate: <span className="text-green-400 font-bold">
+                    {enhancementLog.length > 0 
+                      ? Math.round((enhancementLog.filter(e => e.success).length / enhancementLog.length) * 100)
+                      : 0}%
+                  </span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

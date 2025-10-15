@@ -2,16 +2,19 @@ import React, { useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-// Color mapping function for different weapon levels
+// Color mapping function for different weapon levels - Enhanced vibrant colors
 const getLevelColor = (level) => {
   const colors = {
-    3: { r: 1, g: 0.84, b: 0 },      // Yellow
-    5: { r: 0.58, g: 0, b: 0.83 },   // Purple
-    6: { r: 1, g: 0.55, b: 0 },      // Orange
-    7: { r: 0, g: 1, b: 1 },         // Cyan
-    8: { r: 1, g: 0.08, b: 0.58 },   // Hot Pink
-    9: { r: 0.42, g: 0.35, b: 0.8 }, // Blue-Purple
-    10: { r: 0.25, g: 0.88, b: 0.82 } // Turquoise
+    1: { r: 0.8, g: 0.8, b: 0.8 },   // Silver
+    2: { r: 0.9, g: 0.9, b: 0.9 },   // Light Silver
+    3: { r: 1, g: 0.9, b: 0 },       // Bright Yellow
+    4: { r: 0.8, g: 0.9, b: 0.2 },   // Lime Green
+    5: { r: 0.7, g: 0, b: 1 },       // Bright Purple
+    6: { r: 1, g: 0.6, b: 0 },       // Bright Orange
+    7: { r: 0, g: 1, b: 1 },         // Bright Cyan
+    8: { r: 1, g: 0.2, b: 0.8 },     // Hot Pink
+    9: { r: 0.6, g: 0.4, b: 1 },     // Blue-Purple
+    10: { r: 0.2, g: 0.9, b: 0.9 }   // Bright Turquoise
   };
   
   if (level >= 11) {
@@ -19,14 +22,16 @@ const getLevelColor = (level) => {
     const palette = [
       { r: 1, g: 0, b: 1 },     // Magenta
       { r: 0, g: 1, b: 0.5 },   // Spring Green
-      { r: 1, g: 0.27, b: 0 },  // Orange Red
-      { r: 0.5, g: 0, b: 1 },   // Electric Purple
-      { r: 1, g: 0.84, b: 0 }   // Gold
+      { r: 1, g: 0.3, b: 0 },   // Orange Red
+      { r: 0.6, g: 0, b: 1 },   // Electric Purple
+      { r: 1, g: 0.9, b: 0.2 }, // Gold
+      { r: 0.2, g: 0.8, b: 1 }, // Sky Blue
+      { r: 1, g: 0.8, b: 0.8 }  // Light Pink
     ];
     return palette[Math.floor(Math.random() * palette.length)];
   }
   
-  return colors[level] || { r: 1, g: 0.84, b: 0 }; // Default yellow
+  return colors[level] || { r: 1, g: 0.9, b: 0 }; // Default bright yellow
 };
 
 const ParticleBurst = ({ type, trigger, onComplete, weaponLevel }) => {
@@ -228,10 +233,12 @@ const ParticleBurst = ({ type, trigger, onComplete, weaponLevel }) => {
       const timeFactor = Math.max(0, 1 - time * 0.3); // Slow down over time
       const easedFactor = easeOutQuart(timeFactor);
       
-      // Update positions with smooth motion
-      positions[i3] += velocities[i3] * easedFactor * delta * 60; // 60fps normalization
-      positions[i3 + 1] += velocities[i3 + 1] * easedFactor * delta * 60;
-      positions[i3 + 2] += velocities[i3 + 2] * easedFactor * delta * 60;
+      // Update positions with smooth motion - Optimized for 60fps
+      const frameRate = 60;
+      const timeScale = delta * frameRate;
+      positions[i3] += velocities[i3] * easedFactor * timeScale;
+      positions[i3 + 1] += velocities[i3 + 1] * easedFactor * timeScale;
+      positions[i3 + 2] += velocities[i3 + 2] * easedFactor * timeScale;
       
       // Beautiful physics and effects
       if (type === 'success') {
@@ -289,7 +296,7 @@ const ParticleBurst = ({ type, trigger, onComplete, weaponLevel }) => {
     
     // Beautiful twinkling and fade out with easing
     if (material) {
-      const fadeTime = 5.0; // Even longer fade time for maximum enjoyment
+      const fadeTime = 3.0; // Precise fade time for better timing
       const fadeProgress = Math.min(time / fadeTime, 1);
       const easedFade = easeInOutCubic(fadeProgress);
       
@@ -323,8 +330,8 @@ const ParticleBurst = ({ type, trigger, onComplete, weaponLevel }) => {
     
     positionAttribute.needsUpdate = true;
     
-    // Complete animation when all particles are gone or faded (longer duration)
-    if (time > 5.5 || (allInvisible && time > 2.0)) {
+    // Complete animation when all particles are gone or faded (precise timing)
+    if (time > 3.0 || (allInvisible && time > 1.5)) {
       if (onComplete) {
         onComplete();
       }
