@@ -1,5 +1,5 @@
 import { Diamond } from "lucide-react";
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { gsap } from "gsap";
 
 import items from "./lib/items.json";
@@ -43,20 +43,52 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [lastResult, setLastResult] = useState(null);
   const [gold, setGold] = useState(1000000000000);
+  const [autoStart, setAutoStart] = useState(false);
   const itemRef = useRef(null);
   const smokeRef = useRef(null);
 
   const getSuccessRate = (level) => {
     const rates = {
-      0: 100,
-      1: 100,
-      2: 100,
-      3: 100,
-      4: 100,
-      5: 100,
+      0: 70,
+      1: 60,
+      2: 59,
+      3: 58,
+      4: 56,
+      6: 100,
+      7: 100,
+      8: 100,
+      9: 100,
     };
-    return rates[level] || 99;
+    return rates[level] || 5;
   };
+
+  const getAllItems = () => {
+    const allItems = [];
+    Object.values(items[0].eu).forEach(categoryItems => {
+      allItems.push(...categoryItems);
+    });
+    return allItems;
+  };
+
+  const selectRandomItem = () => {
+    const allItems = getAllItems();
+    const randomIndex = Math.floor(Math.random() * allItems.length);
+    const randomItem = allItems[randomIndex];
+    setSelectedItem(randomItem);
+    setWeaponLevel(0);
+  };
+
+  // Auto-start effect
+  React.useEffect(() => {
+    if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
+      const timer = setTimeout(() => {
+        if (autoStart && selectedItem && selectedElixir && !isStrengthening && gold >= 10) {
+          handleStrengthen();
+        }
+      }, 1000); // 1 second delay to prevent rapid clicking
+      return () => clearTimeout(timer);
+    }
+  }, [autoStart, selectedItem, selectedElixir, isStrengthening, gold, lastResult]);
 
   const handleStrengthen = () => {
     if (!selectedItem || !selectedElixir || isStrengthening || gold < 10)
@@ -257,6 +289,11 @@ function App() {
             {selectedItem && selectedElixir && (
               <div className="text-xs text-[#a8a887]">
                 Success Rate: {getSuccessRate(weaponLevel)}% | Cost: 10 Gold
+                {autoStart && (
+                  <div className="text-green-400 font-bold mt-1">
+                    AUTO-STRENGTHENING ACTIVE
+                  </div>
+                )}
               </div>
             )}
             <button
@@ -297,6 +334,24 @@ function App() {
         </div>
 
         <div className="p-4 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#2b292a]">
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={selectRandomItem}
+              className="text-white text-xs py-1 px-3 rounded-md bg-[#9b7700] hover:bg-[#735906] shadow-yellow-800 shadow-md text-black transition-colors duration-200"
+            >
+              Random Item
+            </button>
+            <button
+              onClick={() => setAutoStart(!autoStart)}
+              className={`text-xs py-1 px-3 rounded-md transition-colors duration-200 ${
+                autoStart 
+                  ? "bg-green-600 hover:bg-green-700 text-white" 
+                  : "bg-gray-600 hover:bg-gray-700 text-white"
+              }`}
+            >
+              {autoStart ? "Auto ON" : "Auto OFF"}
+            </button>
+          </div>
           <div className="border-4 border-[#6c6554] mb-8 py-2 px-4 max-h-64 overflow-y-scroll">
             <h4 className="text-sm text-[#efffc5] font-bold mb-4">Weapons</h4>
             {Object.entries(items[0].eu).map(([categoryKey, categoryItems]) => (
