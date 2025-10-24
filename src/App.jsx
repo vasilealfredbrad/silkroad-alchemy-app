@@ -110,6 +110,8 @@ function App() {
     
     setSelectedItem(randomItem);
     setWeaponLevel(0);
+    setItemHover(false);
+    setHoveredItem(null);
   };
 
   // Removed old createParticles function - using Three.js ParticleSystem instead
@@ -487,19 +489,19 @@ function App() {
   };
 
   return (
-    <div 
+    <div
       ref={screenRef}
-      className={`min-h-screen bg-gradient-to-br from-black via-gray-800 to-black flex items-center justify-center gap-8 transition-all duration-100 ${
+      className={`min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex flex-col items-center justify-start gap-6 px-4 py-6 lg:flex-row lg:items-start lg:justify-center transition-all duration-100 ${
         screenShake ? 'animate-pulse' : ''
       }`}
     >
-      <div className="rounded-lg shadow-2xl w-128 border-2 border-[#969383]">
-        <div className="bg-[#0d0d0d] px-4 py-2 rounded-t-md flex justify-center items-center border-b-2 border-[#969383]">
+      <div className="w-full max-w-3xl lg:max-w-[32rem] rounded-2xl shadow-2xl border border-[#969383] overflow-hidden backdrop-blur-sm">
+        <div className="bg-[#0d0d0d]/90 px-4 py-3 flex justify-center items-center border-b border-[#969383]">
           <h2 className="text-white font-bold text-sm">Alchemy</h2>
         </div>
 
-        <div className="p-4 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#2b292a]">
-          <div className={`border-4 border-[#6c6554] mb-8 relative overflow-hidden bg-gradient-to-br from-[#1a1a0a] to-[#0f0f0a] transition-all duration-300 ${
+        <div className="p-4 sm:p-6 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#1a1b20] space-y-6">
+          <div className={`border-4 border-[#6c6554] rounded-2xl mb-6 sm:mb-8 relative overflow-hidden bg-gradient-to-br from-[#1a1a0a] to-[#0f0f0a] transition-all duration-300 ${
             isStrengthening ? 'border-yellow-500 shadow-lg shadow-yellow-500/20' : ''
           }`}>
             {/* Magic Circle Effect */}
@@ -598,6 +600,7 @@ function App() {
                     }`}
                     onMouseEnter={() => setItemHover(true)}
                     onMouseLeave={() => setItemHover(false)}
+                    onClick={() => setItemHover((prev) => !prev)}
                   >
                     {/* Sparkle Effects During Strengthening */}
                     {isStrengthening && (
@@ -626,7 +629,7 @@ function App() {
                       </span>
 
                       {itemHover && (
-                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 min-w-[300px] bg-[#00174e]/50 text-white rounded-lg shadow-lg p-3 z-10 text-xs backdrop-blur-sm border border-slate-600">
+                        <div className="absolute left-1/2 top-full z-20 mt-3 w-64 -translate-x-1/2 transform bg-[#00174e]/80 text-white rounded-lg shadow-lg p-3 text-xs backdrop-blur-sm border border-slate-600 md:left-full md:top-1/2 md:mt-0 md:-translate-x-0 md:-translate-y-1/2 md:ml-3">
                           <div className="font-bold text-sm flex gap-2 items-start mb-4">
                             <img src={selectedItem.image} alt="" />
                             <div>
@@ -695,17 +698,17 @@ function App() {
             </div>
           </div>
 
-          <div className="flex justify-center items-center gap-8 mb-8">
-            <div className="border-3 border-[#403e3e] bg-[#0a0a07] w-12 h-12">
+          <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+            <div className="border-3 border-[#403e3e] bg-[#0a0a07] w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center rounded-lg">
               <img src={`${selectedElixir}`} alt="" className="w-12" />
             </div>
-            <div className="border-3 border-[#403e3e] bg-[#11110a] w-12 h-12 flex justify-center items-center">
+            <div className="border-3 border-[#403e3e] bg-[#11110a] w-14 h-14 sm:w-16 sm:h-16 flex justify-center items-center rounded-lg">
               <Diamond color="#232322" fill="#232322" />
             </div>
-            <div className="border-3 border-[#403e3e] bg-[#11110a] w-12 h-12 flex justify-center items-center">
+            <div className="border-3 border-[#403e3e] bg-[#11110a] w-14 h-14 sm:w-16 sm:h-16 flex justify-center items-center rounded-lg">
               <Diamond color="#232322" fill="#232322" />
             </div>
-            <div className="border-3 border-[#403e3e] bg-[#11110a] w-12 h-12 flex justify-center items-center">
+            <div className="border-3 border-[#403e3e] bg-[#11110a] w-14 h-14 sm:w-16 sm:h-16 flex justify-center items-center rounded-lg">
               <Diamond color="#232322" fill="#232322" />
             </div>
           </div>
@@ -730,7 +733,7 @@ function App() {
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap justify-center gap-1 text-xs">
+            <div className="flex flex-wrap justify-center gap-1.5 text-[10px] sm:text-xs">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((level) => (
                 <div
                   key={level}
@@ -753,7 +756,7 @@ function App() {
             <div className="text-xs text-gray-300 text-center mb-2">
               Item Inventory
             </div>
-            <div className="flex flex-wrap justify-center gap-1 text-xs max-h-20 overflow-y-auto">
+            <div className="flex flex-wrap justify-center gap-1.5 text-[10px] sm:text-xs max-h-24 overflow-y-auto">
               {Object.entries(itemCounts)
                 .filter(([level, count]) => count > 0)
                 .sort(([a], [b]) => parseInt(a) - parseInt(b))
@@ -772,9 +775,9 @@ function App() {
           </div>
 
           <div className="flex flex-col items-center justify-center mt-2 gap-2">
-            <div className="flex items-center gap-1 text-xs text-yellow-400 font-bold mb-1">
+            <div className="flex items-center gap-1 text-sm text-yellow-400 font-bold mb-1">
               <GoldIcon />
-              <span 
+              <span
                 ref={goldRef}
                 className={`transition-all duration-300 ${
                   goldChange !== 0 ? 'scale-110' : ''
@@ -837,7 +840,7 @@ function App() {
               </div>
             )}
             <button
-              className={`text-white text-sm py-1 px-4 rounded-md cursor-pointer transition-colors duration-200 
+              className={`w-full sm:w-auto text-white text-sm py-2 px-6 rounded-lg cursor-pointer transition-colors duration-200
                 ${
                   selectedItem &&
                   selectedElixir &&
@@ -882,25 +885,25 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="rounded-lg shadow-2xl w-128 border-2 border-[#969383]">
-        <div className="bg-[#0d0d0d] px-4 py-2 rounded-t-md flex justify-center items-center border-b-2 border-[#969383]">
+      <div className="w-full max-w-3xl lg:max-w-[32rem] rounded-2xl shadow-2xl border border-[#969383] overflow-hidden backdrop-blur-sm">
+        <div className="bg-[#0d0d0d]/90 px-4 py-3 flex justify-center items-center border-b border-[#969383]">
           <h2 className="text-white font-bold text-sm">Inventory</h2>
         </div>
 
-        <div className="p-4 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#2b292a]">
-          <div className="flex gap-2 mb-4">
+        <div className="p-4 sm:p-6 bg-gradient-to-br from-[#302d2c] via-[#232126] to-[#1a1b20] space-y-6">
+          <div className="flex flex-wrap gap-2 mb-2 sm:mb-4 justify-center sm:justify-between">
             <button
               onClick={selectRandomItem}
-              className="text-white text-xs py-2 px-4 rounded-md bg-gradient-to-r from-[#9b7700] to-[#b8860b] hover:from-[#735906] hover:to-[#8b6914] shadow-yellow-800 shadow-lg text-black transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center gap-1"
+              className="w-full sm:w-auto text-white text-xs py-2 px-4 rounded-md bg-gradient-to-r from-[#9b7700] to-[#b8860b] hover:from-[#735906] hover:to-[#8b6914] shadow-yellow-800 shadow-lg text-black transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center gap-1"
             >
               <Zap className="w-3 h-3" />
               Random Item
             </button>
             <button
               onClick={() => setAutoStart(!autoStart)}
-              className={`text-xs py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 flex items-center gap-1 ${
-                autoStart 
-                  ? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-green-800 shadow-lg" 
+              className={`w-full sm:w-auto text-xs py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 ${
+                autoStart
+                  ? "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-green-800 shadow-lg"
                   : "bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white shadow-lg"
               }`}
             >
@@ -918,20 +921,20 @@ function App() {
             </button>
             <button
               onClick={() => setShowLog(!showLog)}
-              className="text-xs py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 flex items-center gap-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-800 shadow-lg"
+              className="w-full sm:w-auto text-xs py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 flex items-center justify-center gap-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-blue-800 shadow-lg"
             >
               <Star className="w-3 h-3" />
               {showLog ? "Hide Log" : "Show Log"}
             </button>
           </div>
-          <div className="border-4 border-[#6c6554] mb-8 py-2 px-4 max-h-64 overflow-y-scroll">
+          <div className="border-4 border-[#6c6554] rounded-2xl mb-6 sm:mb-8 py-3 px-4 sm:px-5 max-h-72 sm:max-h-80 overflow-y-auto">
             <h4 className="text-sm text-[#efffc5] font-bold mb-4">Weapons</h4>
             {Object.entries(items[0].eu).map(([categoryKey, categoryItems]) => (
               <div key={categoryKey} className="mb-4">
                 <h5 className="text-xs text-[#c4c4c4] font-semibold mb-2 uppercase underline">
                   {categoryKey}
                 </h5>
-                <div className="flex gap-2 items-center flex-wrap">
+                <div className="flex gap-2 items-center flex-wrap justify-center sm:justify-start">
                   {categoryItems.map((item) => (
                     <div key={item.id} className="relative">
                       <img
@@ -945,12 +948,14 @@ function App() {
                         onClick={() => {
                           setSelectedItem(item);
                           setWeaponLevel(0);
+                          setItemHover(false);
+                          setHoveredItem((prev) => (prev === item.id ? null : item.id));
                         }}
                         onMouseEnter={() => setHoveredItem(item.id)}
                         onMouseLeave={() => setHoveredItem(null)}
                       />
                       {hoveredItem === item.id && (
-                        <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 min-w-[300px] bg-[#00174e]/50 text-white rounded-lg shadow-lg p-3 z-10 text-xs backdrop-blur-sm border border-slate-600">
+                        <div className="absolute left-1/2 top-full z-20 mt-3 w-64 -translate-x-1/2 transform bg-[#00174e]/80 text-white rounded-lg shadow-lg p-3 text-xs backdrop-blur-sm border border-slate-600 md:left-full md:top-1/2 md:mt-0 md:-translate-x-0 md:-translate-y-1/2 md:ml-3">
                           <div className="font-bold text-sm mb-2">
                             {item.name}
                           </div>
@@ -984,7 +989,7 @@ function App() {
               </div>
             ))}
           </div>
-          <div className="border-4 border-[#6c6554] mb-8 p-4">
+          <div className="border-4 border-[#6c6554] rounded-2xl mb-2 sm:mb-6 p-4 flex flex-col items-center gap-3">
             <h4 className="text-sm text-[#efffc5] font-bold mb-4">Alchemy</h4>
             <img
               src="/alchemy/elixir.jpg"
